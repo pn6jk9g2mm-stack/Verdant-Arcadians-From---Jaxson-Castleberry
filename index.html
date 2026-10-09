@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07110b">
+<title>Verdant Arcade — Play Together</title>
+<style>
+:root{--bg:#07110b;--panel:#101d14;--panel2:#14271a;--green:#62f58a;--mint:#b5ffc7;--muted:#a7b8ab;--line:#284532}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#12331c 0,#07110b 48%);color:#f2fff4;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+a{color:inherit}
+.wrap{max-width:1150px;margin:auto;padding:24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0 28px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.04em}
+.logo{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#65ff91,#1e9d4b);color:#06100a;font-size:25px;box-shadow:0 0 32px #42e86c35}
+.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.16em;font-weight:700}
+.pill{border:1px solid #386246;color:var(--mint);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;white-space:nowrap}
+.hero{padding:28px 0 30px;max-width:760px}
+.eyebrow{color:var(--green);text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:900}
+h1{font-size:clamp(38px,7vw,72px);line-height:.99;letter-spacing:-.055em;margin:14px 0}
+h1 span{color:var(--green)}
+.hero p{color:var(--muted);max-width:620px;font-size:17px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}
+input,select{background:#0c1910;border:1px solid var(--line);border-radius:12px;color:white;padding:13px 15px;font:inherit;outline:none}
+input{flex:1;min-width:210px}
+input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px #62f58a20}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 22px}
+.filter{cursor:pointer;border:1px solid var(--line);background:#0c1910;color:var(--muted);border-radius:999px;padding:8px 13px;font-weight:750}
+.filter.active,.filter:hover{background:#183b23;color:var(--mint);border-color:#4cb66a}
+.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:26px 0 14px}
+h2{font-size:22px;margin:0;letter-spacing:-.025em}
+.sectionhead p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{background:linear-gradient(155deg,#13251a,#0c1710);border:1px solid var(--line);border-radius:19px;padding:18px;display:flex;flex-direction:column;min-height:222px;transition:transform .18s,border-color .18s}
+.card:hover{transform:translateY(-3px);border-color:#4fbd70}
+.cardtop{display:flex;align-items:center;gap:12px}
+.emoji{width:48px;height:48px;border-radius:14px;background:#1a3522;display:grid;place-items:center;font-size:25px;flex-shrink:0}
+.card h3{margin:0;font-size:17px}
+.tag{color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:900}
+.card p{color:var(--muted);font-size:14px;margin:14px 0 18px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.btn{display:inline-flex;justify-content:center;align-items:center;text-decoration:none;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;background:var(--green);color:#06100a;border:1px solid var(--green)}
+.btn.secondary{background:transparent;color:var(--mint);border-color:#34543d}
+.btn:hover{filter:brightness(1.08)}
+.notice{margin:22px 0;padding:17px 18px;background:#102218;border:1px solid #315c3c;border-radius:16px;color:var(--muted);font-size:13px}
+.notice strong{color:var(--mint)}
+footer{padding:32px 0 16px;color:#829889;font-size:12px;text-align:center}
+.empty{display:none;color:var(--muted);padding:24px;text-align:center;border:1px dashed var(--line);border-radius:16px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.wrap{padding:16px}.grid{grid-template-columns:1fr}header{align-items:flex-start}.pill{white-space:normal}.hero{padding-top:14px}}
+
+.player-overlay{position:fixed;inset:0;z-index:9999;background:#020704ed;display:none;align-items:center;justify-content:center;padding:14px}
+.player-overlay.open{display:flex}
+.player-box{width:min(1100px,100%);height:min(850px,94dvh);display:flex;flex-direction:column;background:#0b1710;border:1px solid #3b754b;border-radius:18px;overflow:hidden;box-shadow:0 20px 90px #000b}
+.player-head{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#102218;border-bottom:1px solid #284532}
+.player-title{font-weight:900;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.player-head button,.player-actions a{border:1px solid #386246;border-radius:10px;background:#163821;color:#eaffee;padding:9px 12px;font:inherit;font-size:13px;font-weight:800;text-decoration:none;cursor:pointer}
+.player-frame-wrap{position:relative;flex:1;min-height:0;background:#fff}
+.player-frame{width:100%;height:100%;border:0;background:#fff}
+.player-help{padding:10px 14px;background:#0c1910;color:#b7cabc;font-size:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.player-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:560px){.player-overlay{padding:0}.player-box{height:100dvh;border-radius:0}.player-head{padding:10px}.player-head button{padding:8px}.player-help{font-size:11px}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">🌿</div><div>VERDANT ARCADE<small>YOUR GREEN GAMING HQ</small></div></div>
+  <div class="pill">CHROME • CHROMEBOOK • MAC</div>
+</header>
+<main>
+<section class="hero">
+  <div class="eyebrow">One hub. Your whole squad.</div>
+  <h1>Pick a game.<br><span>Bring your crew.</span></h1>
+  <p>A green-and-black gaming hub. Tap a tile to try opening it right here without leaving Verdant Arcade.</p>
+  <div class="controls">
+    <input id="search" type="search" placeholder="Search games and tools…" aria-label="Search games and tools">
+    <select id="category" aria-label="Filter by category">
+      <option value="all">All categories</option><option value="sandbox">Sandbox</option><option value="horror">Horror</option><option value="classic">Classics</option><option value="cloud">Cloud gaming</option><option value="social">Social</option><option value="ai">AI</option>
+    </select>
+  </div>
+  <div class="filters" aria-label="Quick filters">
+    <button class="filter active" data-filter="all">All</button><button class="filter" data-filter="sandbox">Sandbox</button><button class="filter" data-filter="horror">Horror</button><button class="filter" data-filter="classic">Classics</button><button class="filter" data-filter="cloud">Cloud gaming</button>
+  </div>
+</section>
+<div class="sectionhead"><div><h2>Game shelf</h2><p>Choose a tile to launch it in the built-in player when the service allows it.</p></div><span class="tag" id="count">12 PICKS</span></div>
+<section class="grid" id="grid">
+<article class="card" data-category="sandbox" data-search="eaglercraft minecraft multiplayer shared worlds survival bedwars">
+  <div class="cardtop"><div class="emoji">⛏️</div><div><div class="tag">Sandbox • Multiplayer</div><h3>Minecraft in browser</h3></div></div>
+  <p>Launch Eaglercraft in Chrome and use its Multiplayer menu to join compatible servers or invite friends to a shared world.</p>
+  <div class="actions"><a class="btn" href="https://eaglercraft.com/play" target="_blank" rel="noopener noreferrer">Play here ▶</a><a class="btn secondary" href="https://eaglercraft.com/" target="_blank" rel="noopener noreferrer">Worlds & servers</a></div>
+</article>
+<article class="card" data-category="sandbox" data-search="roblox games create play">
+  <div class="cardtop"><div class="emoji">🧱</div><div><div class="tag">Sandbox</div><h3>Roblox</h3></div></div>
+  <p>Explore experiences, play with friends, and jump into your favorite worlds.</p>
+  <div class="actions"><a class="btn" href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer">Try Roblox here ▶</a></div>
+</article>
+<article class="card" data-category="horror" data-search="fnaf five nights at freddys horror">
+  <div class="cardtop"><div class="emoji">🐻</div><div><div class="tag">Horror</div><h3>Five Nights at Freddy’s</h3></div></div>
+  <p>Find official game information and available versions from the creator’s store pages.</p>
+  <div class="actions"><a class="btn" href="https://store.steampowered.com/search/?term=Five+Nights+at+Freddy%27s" target="_blank" rel="noopener noreferrer">View FNAF options ▶</a></div>
+</article>
+<article class="card" data-category="horror" data-search="poppy playtime chapter horror">
+  <div class="cardtop"><div class="emoji">🧸</div><div><div class="tag">Horror</div><h3>Poppy Playtime</h3></div></div>
+  <p>Explore the official game series and available chapters.</p>
+  <div class="actions"><a class="btn" href="https://store.steampowered.com/search/?term=Poppy+Playtime" target="_blank" rel="noopener noreferrer">View Poppy options ▶</a></div>
+</article>
+<article class="card" data-category="horror" data-search="granny original dv loper horror escape browser alternative">
+  <div class="cardtop"><div class="emoji">👵</div><div><div class="tag">Horror • Original is not browser-playable</div><h3>Granny</h3></div></div>
+  <p>The original Granny by DVloper is not officially offered as a free browser game. Try a separate Granny-inspired browser game, or view the official original game page.</p>
+  <div class="actions"><a class="btn" href="https://www.crazygames.com/game/a-grim-granny" target="_blank" rel="noopener noreferrer">Try browser alternative ▶</a><a class="btn secondary external-link" href="https://store.steampowered.com/app/962400/Granny/" target="_blank" rel="noopener noreferrer">Official Granny page ↗</a></div>
+</article>
+<article class="card" data-category="horror" data-search="hello neighbor stealth horror original roblox fan remake">
+  <div class="cardtop"><div class="emoji">🏠</div><div><div class="tag">Horror • Fan remake available</div><h3>Hello Neighbor</h3></div></div>
+  <p>Try a community-made Hello Neighbor experience on Roblox inside the player if Roblox allows it. This is a fan remake, not the original game.</p>
+  <div class="actions"><a class="btn" href="https://www.roblox.com/games/100644371663358/Hello-Neighbor-Full-Game-Remake" target="_blank" rel="noopener noreferrer">Try Roblox remake ▶</a><a class="btn secondary external-link" href="https://store.steampowered.com/app/521890/Hello_Neighbor/" target="_blank" rel="noopener noreferrer">Official game page ↗</a></div>
+</article>
+<article class="card" data-category="horror" data-search="garten of banban banban kindergarten horror official roblox euphoric bros">
+  <div class="cardtop"><div class="emoji">🟣</div><div><div class="tag">Horror • Official Roblox experience</div><h3>Garten of Banban</h3></div></div>
+  <p>Try the Garten of Banban Roblox experience made with the creators. Roblox may require sign-in and may block the in-page player on some devices.</p>
+  <div class="actions"><a class="btn" href="https://www.roblox.com/games/12398038681/Garten-of-Banban" target="_blank" rel="noopener noreferrer">Try in player ▶</a><a class="btn secondary external-link" href="https://garten-of-banban.com/game/" target="_blank" rel="noopener noreferrer">Official series site ↗</a></div>
+</article>
+<article class="card" data-category="classic" data-search="bob the robber classic browser puzzle stealth">
+  <div class="cardtop"><div class="emoji">🕵️</div><div><div class="tag">Classic</div><h3>Bob the Robber</h3></div></div>
+  <p>Look for browser-playable editions of the sneaky classic.</p>
+  <div class="actions"><a class="btn" href="https://www.crazygames.com/search?q=bob%20the%20robber" target="_blank" rel="noopener noreferrer">Try browser versions ▶</a></div>
+</article>
+<article class="card" data-category="cloud" data-search="xbox cloud gaming game pass account">
+  <div class="cardtop"><div class="emoji">🎮</div><div><div class="tag">Cloud gaming</div><h3>Xbox Cloud Gaming</h3></div></div>
+  <p>Stream supported games in a browser. A compatible account, subscription, and supported region may be required.</p>
+  <div class="actions"><a class="btn" href="https://www.xbox.com/play" target="_blank" rel="noopener noreferrer">Try Xbox here ▶</a></div>
+</article>
+<article class="card" data-category="social" data-search="tiktok videos social">
+  <div class="cardtop"><div class="emoji">📱</div><div><div class="tag">Social</div><h3>TikTok</h3></div></div>
+  <p>Open TikTok on the web to browse videos and creators.</p>
+  <div class="actions"><a class="btn" href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer">Open TikTok here ▶</a></div>
+</article>
+<article class="card" data-category="ai" data-search="ai chatgpt assistant">
+  <div class="cardtop"><div class="emoji">🤖</div><div><div class="tag">AI corner</div><h3>ChatGPT</h3></div></div>
+  <p>Brainstorm, ask questions, get help with homework, or plan your next game build.</p>
+  <div class="actions"><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Open ChatGPT here ▶</a></div>
+</article>
+<article class="card" data-category="classic" data-search="classic browser games arcade puzzle platformer">
+  <div class="cardtop"><div class="emoji">🕹️</div><div><div class="tag">Classics</div><h3>Browser arcade</h3></div></div>
+  <p>Browse a collection of quick games that run in a web browser.</p>
+  <div class="actions"><a class="btn" href="https://www.crazygames.com/" target="_blank" rel="noopener noreferrer">Browse games here ▶</a></div>
+</article>
+</section>
+<div class="empty" id="empty">No games match that search. Try another word.</div>
+<div class="notice"><strong>Same-site player:</strong> Games and services will try to load in a player panel on this page. Some providers block embedding. The original Granny and Hello Neighbor games are not made into free browser games by this hub; official pages may require purchase/download. The Hello Neighbor Roblox option is a fan remake. Garten of Banban links to a Roblox experience associated with its creators, but Roblox may require sign-in or refuse embedding. If a panel stays blank, use its “Open separately” option. Multiplayer note: Verdant Arcade links to Eaglercraft rather than pretending to host Minecraft itself. For multiplayer, open Eaglercraft, choose <strong>Multiplayer</strong> and join a compatible server, or use its shared-world invite feature. Everyone needs internet access, and school networks may block gaming sites or multiplayer connections. <a href="https://eaglercraft.com/" target="_blank" rel="noopener noreferrer">Check Eaglercraft’s server and shared-world options ↗</a></div>
+</main>
+<footer>VERDANT ARCADE • Fan-made game hub • Not affiliated with the linked games or services.</footer>
+</div>
+
+<div class="player-overlay" id="playerOverlay" role="dialog" aria-modal="true" aria-labelledby="playerTitle">
+  <div class="player-box">
+    <div class="player-head"><div class="player-title" id="playerTitle">VERDANT PLAYER</div><button id="playerClose" type="button">✕ Close</button></div>
+    <div class="player-frame-wrap"><iframe class="player-frame" id="playerFrame" title="Game player" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    <div class="player-help"><span>If this area is blank, the site may block being shown inside another website.</span><div class="player-actions"><a id="playerExternal" href="https://eaglercraft.com/play" target="_blank" rel="noopener noreferrer">Open separately ↗</a><button id="playerReload" type="button">Reload panel</button></div></div>
+  </div>
+</div>
+
+<script>
+
+const overlay=document.getElementById('playerOverlay'), frame=document.getElementById('playerFrame'), playerTitle=document.getElementById('playerTitle'), external=document.getElementById('playerExternal');
+function openPlayer(url,title){playerTitle.textContent=title||'VERDANT PLAYER';external.href=url;frame.src=url;overlay.classList.add('open');document.body.style.overflow='hidden';document.getElementById('playerClose').focus();}
+function closePlayer(){overlay.classList.remove('open');frame.src='about:blank';document.body.style.overflow='';}
+document.querySelectorAll('.card .actions a.btn:not(.external-link)').forEach(link=>{link.addEventListener('click',event=>{event.preventDefault();openPlayer(link.href,link.closest('.card').querySelector('h3')?.textContent||link.textContent);});});
+document.getElementById('playerClose').addEventListener('click',closePlayer);
+document.getElementById('playerReload').addEventListener('click',()=>{try{frame.contentWindow.location.reload()}catch(e){frame.src=frame.src}});
+overlay.addEventListener('click',e=>{if(e.target===overlay)closePlayer()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))closePlayer()});
+
+const search=document.getElementById('search'), category=document.getElementById('category'), cards=[...document.querySelectorAll('.card')], empty=document.getElementById('empty'), count=document.getElementById('count');
+let quick='all';
+function filterCards(){const q=search.value.trim().toLowerCase(), c=category.value==='all'?quick:category.value;let shown=0;cards.forEach(card=>{const okC=c==='all'||card.dataset.category===c;const okQ=!q||(card.dataset.search+' '+card.innerText).toLowerCase().includes(q);card.style.display=okC&&okQ?'flex':'none';if(okC&&okQ)shown++});empty.style.display=shown?'none':'block';count.textContent=shown+' PICKS';}
+search.addEventListener('input',filterCards);category.addEventListener('change',()=>{quick='all';document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));filterCards()});
+document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{quick=b.dataset.filter;category.value='all';document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===b));filterCards()}));
+filterCards();
+</script>
+</body>
+</html>
